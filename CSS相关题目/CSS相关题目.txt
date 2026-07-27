@@ -1,0 +1,25 @@
+1.说一下CSS盒模型？
+    标准盒模型和IE盒模型：通过box-sizing设置为content-box和border-box来实现 
+    一个元素的占位可分为四个部分：content，padding，border，margin
+    contentBox的width和height只包括content部分，如果加padding，border，margin  则整个盒子还会变大 扰乱其它布局
+    borderBox的width和height包含content，padding和border部分，margin不包含在内 当设置padding和border的时候会自动缩小content的大小 不扰乱布局
+
+2.CSS选择器的优先级？
+    !important > 行内样式 > id选择器 > 类/伪类/属性选择器 > 标签/伪元素选择器 > 全局选择器/各种组合器
+    CSS拥有 继承性 层叠性 优先级（选择器的权重）
+    权重比较时是共4位 一次从高到低比较 不进位 !important是无限大 后续依次为1000 100 10 1 0
+    通过继承获得的属性权重为0（但是仍低于全局选择器 可以理解为继承下来的属性没有权重）
+
+3.隐藏元素的方法有哪些？
+    display:none 不显示 不占位
+    visibilit:
+
+4.px和rem的区别是？
+
+5.重绘和重排是什么？区别是？
+
+6.让一个元素水平垂直居中的方法？
+
+7.CSS中可以继承的属性？不可继承的属性？
+
+8.预处理器？

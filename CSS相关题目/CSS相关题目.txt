@@ -11,15 +11,31 @@
     通过继承获得的属性权重为0（但是仍低于全局选择器 可以理解为继承下来的属性没有权重）
 
 3.隐藏元素的方法有哪些？
-    display:none 不显示 不占位
-    visibilit:
+    display:none 不显示 不占位  
+    element.hidden = true（html5原生属性） 完全移出空间  等同于display：none
+    visibility:hidden 隐藏但占位 无法点击 无法获取焦点 可防止页面抖动
+    opacity：0 透明度为0 元素完全透明 但仍旧可以点击 常用于动画过渡
 
 4.px和rem的区别是？
+    px是固定的单位 即真实屏幕上的一个物理像素点  
+    rem是相对的单位 是相对于根节点的font-size的大小 默认值通常为16px 常用于移动端适配和响应式布局 通过媒体查询更改根字体大小 整体都会变化
+    em是相对的单位 是相对于当前节点/父节点的font-size的大小 如果用在font-size上 则继承父元素的font-size 如果用在width/margin/padding上 则继承自身的font-size
+    px是完全固定的 适合于border/shadow rem跟着根大小变 适合做响应式和移动端 em则适合组件内调整字体大小
 
 5.重绘和重排是什么？区别是？
+    二者是性能优化中比较重要的两个概念 重绘是颜色改变 重排是布局改变 重排的性能消耗远大于重绘
+    重绘不一定导致重排 重排一定会导致重绘
+    重排因素：尺寸/位置/显示隐藏（完全移除占位）/文本变化/内容变化/窗口变化/读取一些涉及浏览器尺寸的属性（强制重排）
+    重绘因素：颜色相关/可见性（visibility）/透明度/阴影/变化transform（GPU 性能极佳）
+    DOM树+CSSOM树=渲染树->布局重排->绘制重绘->合成（GPU）->屏幕显示 
+    性能优化：批量修改样式 transform做动画 will-change 尽量使修改停留在合成 而不要触发布局和绘制
 
 6.让一个元素水平垂直居中的方法？
+    1.text-aligns+line-height   2.display/gird/table布局   3.定位+transform(top:50%)   4.定位+margin:auto(top:0)
 
 7.CSS中可以继承的属性？不可继承的属性？
+    常见的可以继承的属性：font（字体相关） line-height（文本相关） list-style（列表相关） border-spacing（表格相关） visibilit（可见性）
 
 8.预处理器？
+    SASS和LESS css预处理器 增加 混入，变量，函数，嵌套 功能
+    写法优化 便于维护 便于理解 提升开发效率

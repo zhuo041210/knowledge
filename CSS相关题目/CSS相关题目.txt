@@ -37,5 +37,5 @@
     常见的可以继承的属性：font（字体相关） line-height（文本相关） list-style（列表相关） border-spacing（表格相关） visibilit（可见性）
 
 8.预处理器？
-    SASS和LESS css预处理器 增加 混入，变量，函数，嵌套 功能
+    SASS和LESS css预处理器 增加 变量，混入，函数，嵌套 功能
     写法优化 便于维护 便于理解 提升开发效率

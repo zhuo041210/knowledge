@@ -1,10 +1,34 @@
 1.JS的组成部分？
+    三大部分:
+    ECMAScript(我们常用的let const 箭头函数 核心点) 
+    BOM(浏览器对象模型 如setInterval/console) 
+    DOM(文档对象模型 如document.querySelect)
 
 2.JS的内置对象有哪些？
+    String Boolean Number Object Function Array
+    Math Date RegExp Promise JSON Map Set Error Symbol
 
 3.JS操作数组的方法有哪些？
+    第一组：push pop unshift shift 
+    splice(任意位置增删改) splice(a,b,c,d...) 表示从下标a开始，删除b个元素，并按顺序插入c,d... 
+    slice(截取一段，不改变原数组)
+
+    第二组：forEach map filter 
+    find（找到第一个符合的元素并返回） findIndex（找到第一个符合的元素并返回其下标）
+    some（返回布尔值 表示数组中是否有元素满足条件） every（返回布尔值 表示数组中是否所有元素满足条件） 
+    reduce（累加器） reduce((sum,cur)=>{ return xxx},init) init为sum的初始值 sum为目前的累加值 cur为当前元素
+
+    第三组：indexOf(根据简单值查找下标) includes(根据简单值查找是否有) sort reverse
+
+    第四组：concat(合并数组) join(数组变为字符串) split(字符串变为数组) 
+    flat(数组扁平化 展开深层数组) Array.from(把类数组转为数组) Array.isArray(判断是否为数组)
 
 4.JS对数据类型的检测方法有哪些？
+    typeof 检测基本数据类型（对于null返回的是object，对于数组/对象返回的都是对象，对于函数返回的是函数）
+    instanceof 检测是否属于某构造函数的实例（原型链原理 有很多失误点）
+    constructor 判断正确 但极易被修改
+    Object.prototype.toString.call 最全能的方法 基本不会出错 会以 '[object xxx]'的形式出现 xxx即为数据的类型
+    Array.isArray 专门用于检测数组
 
 5.简单说一下闭包？闭包有什么特点？
 

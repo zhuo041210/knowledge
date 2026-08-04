@@ -49,14 +49,37 @@
 
 
 8.vue如何进行组件通信？
+    根据传递信息双方的关系 对组件通信进行分类（仍旧讲的是vue2里的通信方式 vue3其实有很多新增的 后面再看）
+    1.父传子：props和ref  ref是给子组件绑定ref后，通过this.$refs.refName.dataName对子组件内部的数据方法进行访问；props则是父组件内以通过动态绑定形式传递参数，子组件内使用props接收即可
+    2.子传父：自定义事件$emit 父组件给子组件绑定一个自定义事件（vue2里就算是原生事件 如果被绑定在组件标签上也会被识别为自定义事件）并指定回调 在子组件内部通过$emit触发事件并携带参数 参数会自动传递给父组件的回调函数的参数部分
+    3.兄弟间：全局事件总线$bus 类似于自定义事件 只不过是创建了一个特殊的vue实例并把它挂在了vue的原型上（为了让所有组件都能通过this访问，并且该实例身上还需要有$on和$emit方法） 需要传递数据的一方激发事件 需要接受数据的一方绑定事件
+    4.vuex： 任意组件的通信 dispatch触发action内存的方法/commit触发mutation内存的方法 state存数据/action执行异步逻辑/mutation修改数据
 
 9.keep-alive是什么？如何使用？
+    vue里的一个内置组件 用于缓存路由中未活跃的组件 使其在不显示的时候不被销毁而是存在于缓存中 常用于经常显示/隐藏的组件 用于提高性能/加快页面加载
+    使用方法：
+    1.把路由的根组件（第一层路由）包裹，则所有路由组件都不会被销毁；
+    2.include属性可以配合 单个组件名字 逗号连接的多个组件名字 正则表达式  excluded属性类似于include，但意为不缓存 注意：此时的名字并非路由里的name，而是单个组件的name；
+    3.可以在router里面配置meta里的自定义字段isKeepAlive 然后被keep-alive包裹的router-view里写上v-if='$route.meta.isKeepAlive'，同时配合另一个view-router v-if='!$route.meta.isKeepAlive'
+
+    keep-alive拥有max属性，表示最多可以同时缓存到cache内的组件数量，采用的是LRU算法（缓存满时自动淘汰最久没有使用的那个组件），防止页面内存占用过多而越用越卡
 
 10.axios是如何做封装的？
+    下载安装 -- 创建实例（create）并传入超时时间和BASE地址（通常配合环境变量env使用，开发生产环境里地址不同）-- 配置请求拦截器（记得返回config）和响应拦截器（http状态码和业务状态码，不同状态码的错误统一处理） -- 正常处理数据，返回成功/失败的Promise实例 -- 
+    接口使用时引用绑定好的axios实例，并写上URL,methods,parmas，封装完毕后暴露 -- 组件内引用接口并使用
 
 11.vue路由是怎么实现传参的？
+    三种方式：
+    1.parmas传参 直接使用this.$router.push({name:'xxx',parmas:{xxx}})即可传参 接收this.$route.parmas.xxx收到即可 有致命缺点：刷新之后参数丢失！！！（但我感觉我实际写业务基本没遇到过这种情况？）
+    2.query传参 和parmas传参的方式和接收方式一致 只是换成了query 这种形式的参数会拼接在地址的后方（使用了?和&）
+    3.路径传参 在路由中配置占位符 并在请求路径中直接用模板字符串拼接参数即可 注意需要位置相对应
 
 12.vue路由的hash模式和history模式的区别？
+    vue默认是hash模式，hash适合做单页面应用
+    1.hash模式的路径里带#,history则不带，history更加美观；
+    2.hash的兼容性好，更加稳定，适合做后台管理系统；history有利于SEO，适合做C端页面；（顺便扩展下，a端是admin（管理者用的，如整个公司的数据记录），b端是business（企业用的，如管理后台），c端是custom（客户用的，如宣传官网））
+    3.hash模式浏览器中刷新正常展示页面，而history模式刷新报错404（必须配合后端）；因为hash不会把#后面的内容发送，而history则会请求完整地址的服务器
+    4.hash原理是事件的监听（hashchange），history则是API的调用（pushState/replaceState）
 
 13.路由拦截是怎么实现的？
 

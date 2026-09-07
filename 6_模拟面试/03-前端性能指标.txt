@@ -1,0 +1,16 @@
+3.前端性能指标：
+
+FCP first-contentful-paint:第一个dom元素出现在页面上的时间，用户感知页面开始加载的标志
+减少服务器响应时间（TTFB），消除渲染阻塞的JS与CSS
+
+LCP largest-contentful-paint：视口内的最大内容元素渲染完成的时间，代表页面核心内容加载完毕
+优化并预加载LCP元素（如压缩图片），使用服务端渲染（SSR）
+
+CLS cumulative-layout-shift：页面加载过程中视觉元素的非预期移动程度，代表视觉稳定性
+为图片，视频等元素设置固定尺寸或宽高比，为动态内容预留空间
+
+TTI time-to-interactive: 页面加载到完全可交互（可靠响应用户操作）的时间
+延迟加载非关键JS，拆分JS代码，拆分JS长任务
+
+TBT total-blocking-time：衡量FCP到TTI之间的时间，反映页面加载期间的响应迟钝程度
+优化或异步加载第三方脚本，和TTI与FCP的优化紧密相关

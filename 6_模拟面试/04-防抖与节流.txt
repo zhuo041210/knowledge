@@ -5,3 +5,35 @@
 
 节流：在一段时间内用户连续点击按钮，只有第一次的事件被执行，且在指定时间内，该事件只会被执行一次
 节流保证连续点击事件时，指定时间内，只有第一次时间被执行
+
+防抖和节流手写代码的要点：
+1.函数接受两个参数，一个参数是延迟时间，另一个参数是需要防抖/节流的函数，该函数返回一个封装好的防抖函数；
+2.剩余参数接收方式，
+...arg 写在创建函数的函数参数中的时候，表示接收所有参数（未知个数），并把所有参数放入数组中打包好
+但同样，...arg 如果写在对象或者数组中，则表示展开运算符，把对象或者数组展开成很多单个的元素
+3.函数使用apply改变this指向，并且apply是立刻执行函数，且函数需要的参数一定要传入一个数组，apply会自动拆解数组把各个参数分开
+
+节流函数类似 其实二者的难点/要点就是：
+以防抖函数为例:
+function debounce(fn,delay){
+    let timer = undefined
+    return function(...args){
+        if(timer) timer = undefined
+        timer = setTimeOut(function(){
+            fn.apply(this,args)
+        },delay)
+    }
+}
+
+也可以写成箭头函数，这样就不用改变this的指向：
+function debounce(fn,delay){
+    let timer = undefined
+    return function(...args){
+        if(timer) timer = undefined
+        timer = setTimeOut(() => {
+            fn(...args)
+        },delay)
+    }
+}
+
+节流基本完全一致，只是timer的判断变为timer存在则直接返回，不存在则赋值timer增加定时器

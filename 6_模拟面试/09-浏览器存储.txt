@@ -1,0 +1,8 @@
+9.浏览器的不同存储方式：
+
+1.cookie：会话身份证，容量小（约4KB），自动随HTTP发送，常用于识别用户身份，
+设置HTTPOnly防止XSS攻击，设置Same-Site防止CSRF攻击
+
+2.localStorage：本地永久仓库，只能被代码或者手动清除，同源的所有标签页共享
+
+3.sessionStorage：类似于localStorage，但生命周期仅存在于标签页的打开和关闭之间，在不同的标签页内互相隔离

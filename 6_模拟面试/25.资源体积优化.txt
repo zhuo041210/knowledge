@@ -1,0 +1,17 @@
+25.资源体积优化
+
+1.图片格式文件：
+PNG和JPG的图片体积较大，现代常用WebP和AVIF来替代，体积减少25-30%
+使用srcset提供合适尺寸的图片，loading='lazy'懒加载图片
+
+2.字体文件：
+子集化：提取实际使用的字符生成字体子集，显著降低中文字体文件
+优化加载：font-display:swap 避免渲染阻塞，防止字体格式未下载时浏览器不展示字体，用户体验差
+
+3.第三方依赖：
+Tree-Shaking + sideEffects 移除没有副作用且没有使用的ESM死代码，按需引入打包
+CDN + externals 打包时减小体积，运行时通过CDN加载对应资源，配合externals使用（externals告诉打包工具哪些依赖包走CDN缓存）
+
+CDN是从外部拿到对应依赖包的CDN资源，
+externals： a：b 则是构建时告诉打包工具遇到import a from 'A'时，不要去node_modules里打包，而是直接使用生产环境里的全局变量A
+而这个位置的全局变量A，是由生产环境里的CDN资源加载挂载到全局变量上的

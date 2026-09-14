@@ -1,0 +1,12 @@
+26.前端路由
+
+Hash模式和History模式，Hash模式带有#(简单，兼容性好，监听haschange事件)，History模式pushState和replcaState改地址，监听popstate，服务器端需要配合
+基本流程：定义路由表 -- 创建匹配器 -- 拦截<a>和<link>默认的跳转行为，让路由系统接管本次跳转 -- 根据URL匹配出路由 -- 嵌套渲染对应页面
+
+补充一点：
+在原生JS里，更改地址栏并不意味着页面会发生变化，我们在vue里使用的router是帮我们对hash，history相关操作进行了封装，才会有地址栏变化 -- 页面自动变化的效果
+实际上对于原生的JS，history模式是通过pushState后手动调用renderRoute实现的页面重新渲染，并且通过popState事件监听浏览器的后退前进操作，在事件回调内部执行renderRoute；
+hash模式则是通过hashChange事件的监听+回调内执行renderRoute
+
+另外有关路由的知识点：
+导航守卫：进入/离开前执行校验，鉴权，数据预取和重定向

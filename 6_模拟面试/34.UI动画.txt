@@ -1,0 +1,14 @@
+34.UI动画
+
+CSS动画与JS动画：CSS优先，JS灵活，只更改transform/opacity；
+能用CSS做的就用CSS做，因为CSS的硬件加速和浏览器优化很好；需要复杂时序/交互/物理效果时用JS(requestAnimationFrame/动画库)，两者都需要尽量只更改transform/opacity，并控制好刷新频率
+
+性能差异：
+CSS动画由浏览器合成线程驱动，transform/opacity走合成层（避免重排+重绘）；transition和animation可复用优化；
+JS动画灵活，可做时间线，物理模拟，事件响应，但若直接操作style需用rAF并避免布局抖动；
+
+实践：
+只更改transform/opacity;必要时使用will-change新增合成层，但需要适度，否则消耗大量内存；读写分离，不要交叉串行；
+
+
+

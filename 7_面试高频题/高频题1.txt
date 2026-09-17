@@ -1,0 +1,185 @@
+1.vue2和vue3的差异：
+
+响应式方面，vue2使用defineProperty，vue3使用Proxy
+（vue2需要使用$set和$delete以及数组的各种方法以实现对象/数组的响应式检测，而vue3原生支持各种对象/数组的变化，性能更优）
+
+代码规范方面，vue2使用optionsAPI，vue3使用compositionAPI
+（vue2选项式API，代码分类比较清晰，但是各个模块混用在一起，不方便维护；vue3组合式API，相关功能的代码集中，使用自定义hooks复用代码）
+
+性能优化方面，vue3使用tree-shaking（未使用的API打包时清除），静态节点提升（对于DOM更新时候，静态节点直接复用，不重复渲染），动态节点patch flags（动态节点打上标记，diff算法直接定位，提升diff效率）
+
+
+
+2.vue的生命周期（父子关系），以及常见实践的钩子
+
+vue2：创建 + 挂载 + 更新 + 卸载 beforeCreate created（常用于异步请求数据） beforeMount mounted（常用于操作dom，绑定事件） beforeUpdate updated beforeDestroy（常用于解绑事件，消除定时器） destroyed
+vue3：setup + 挂载 + 更新 + 卸载  onBeforeMount onMounted onBeforeUpdate onUpdated onBeforeUnmount onUnmounted
+
+父组件永远等待子组件执行完毕：
+父beforecreate create beforemount 子 beforecreate create beforemount mount 父mount
+父beforeupdate 子beforeupdate update 父update
+父beforedestroy 子beforedestroy destroy 父destroy
+
+keep-alive路由组件不销毁的缓存 配合activated deactivated使用
+
+
+3.Proxy在vue3中的优势：
+
+Proxy是对对象整体监视，并不像defineProperty那样对每个属性建造getter和setter，所以对属性的新增/删除都能检测，并且同样对数组的下标赋值，对数组的各种方法也能够检测，省去vue2响应式的很多大坑 
+Proxy是惰性响应式，它不会一开始就深层遍历数据，而是用到的时候再进行响应式处理，性能更好
+Proxy支持更多种数据类型，比如map，set，weakmap，weakset
+
+
+4.v-if和v-show：
+
+v-if真实的摧毁和生成dom，决定其在dom树中是否存在，适用于切换较少的元素；
+v-show是通过控制display：none来展示和隐藏dom，节点始终存在于dom树中，而不一定存在于render tree中，适用于切换较多的元素；
+
+
+5.computed和watch：
+
+computed计算属性，有缓存，用于已有值生成派生值，已有值变化则派生值重新计算，必须返回一个值；
+watch监视器，监视某个值变化后执行相关逻辑，多为异步操作，业务逻辑；
+
+
+6.v-for中key的作用：
+
+每个循环子项唯一的标识，正确使用可以避免表格数据错位（输入框问题），提升DOM元素复用效率和Diff算法效率
+
+
+7.为什么data配置项需要写成函数的形式：
+
+组件的设计核心就是可复用性，若写成对象，则所有公用此组件的地方都共用同一套数据，数据会极其紊乱；
+写成函数形式时，每个组件复用的时候都调用函数返回数值相同但是引用不同的独立数据，使组件的数据相互隔离，互不影响；
+
+
+8.组件间通信总览：
+
+父子通信：props（父->子）+ $emit（子->父）   语法糖 v-model 即为 modelValue + update：modelValue 的props值和自定义事件
+
+
+9.v-model在vue2和vue3里的区别：
+
+vue2内，v-model的底层是 value的props + @input的自定义事件 ，一个组件只能绑定一个v-model，且value和input事件容易重名，常用sync修饰符替代v-model（出现了API不统一的情况）
+vue3内，v-model的底层是 modelValue的props + @update：modelValue的自定义事件 ，一个组件可以同时绑定多个v-model：xxx，且不会重名，sync修饰符废弃，API完全统一
+
+
+10.nextTick的原理：
+
+Vue的响应式更新是批量的，当数据发生变化，Vue不会立刻更新页面，而是把更新放入一个基于Promise的微任务队列中，等待所有数据都更新完毕后统一执行DOM的更新，
+利用的是JS的事件循环机制（同步代码内修改数据，微任务内更新DOM），并且在微任务清空的过程中，把nextTick的调用放在DOM已完全更新完毕之后，确保获取到的是最新的DOM；
+即nextTick就是将回调函数放在微任务列表中，且在当次更新队列执行完毕新DOM生成之后再执行
+
+
+11.keep-alive和include/exclude：
+
+keep-alive使用LRU算法（最近最少使用算法）高效利用缓存，配合include/exclude来指定缓存的目标（绑定的是组件的名字！！！），配合actvated和deactivated管理组件激活/失活状态
+
+
+12.自定义指令的执行：
+
+当我们需要直接操作DOM时，使用自定义指令（因为自定义指令的第一个el参数自动获取被绑定的元素，第二个参数context表示该指令绑定的上下文（这次绑定的各种参数信息））
+常见的使用：权限校验，焦点控制,集成三方库（初始化容器），图片懒加载...
+
+自定义指令也有自己的生命周期钩子：
+vue2：bind（被绑定到元素上，元素还未挂载前） inserted（元素挂载到页面上时） unbind（元素被卸载时）
+vue3：created beforeMount mounted（相当于inserted） beforeUpdate updated beforeUnmount unmounted（相当于unbind）
+重点钩子是mounted（用于操作dom）和unmounted（用于清除事件，定时器）
+
+
+13.vue-router的两种模式：
+
+hash模式兼容性好，路径上带#，简单实现，无需服务端配合，无论何种方式，只要地址栏变化，则通过hashchange事件调用renderRouter，实现路由跳转；
+history模式更像真实网址，需要服务器端配合（fallback到index.html，否则404报错），通过pushstate和replacestate事件来实现路由变化（手动renderRouter处理页面跳转），popstate监听浏览器的前进后退（浏览器会自动改变地址，但页面还没变，需要renderRouter实现页面渲染）；
+对比之下，history模式没法像hash模式那样统一处理不同路径导致的路由变化，更加麻烦一些
+
+
+14.路由守卫的触发顺序和基本功能：
+
+全局路由守卫 beforeEach -- 独享路由守卫 beforeEnter -- 组件内路由守卫 beforeRouteEnter
+通常会在beforeEach内对身份进行校验：
+1.如果路由跳转到的路径为白名单路径（如登录页面），直接放行；
+2.如果路由跳转到的路径为需要登录才能访问的路径（如个人信息），检查是否有token存在，
+如若无token，则直接重定向到登录页；
+如果有token，则根据token拉取用户信息，动态添加有权限的路由表；
+
+
+15.路由懒加载和按需加载：
+
+路由懒加载：箭头函数+import实现，极大提高首屏性能；
+按需加载：减小初始包体积（块分包，只加载必须项，防止加载的资源永远用不到的情形）；
+
+
+16.Vue的虚拟DOM，Diff策略与更新粒度：
+
+Vue的虚拟DOM：使用JS模拟出来的真实DOM的轻量对象，用来描述真实DOM的样子（因为相比于操作真实DOM，操作JS对象快得多，可以将多次dom的更改合成一次批量的JS更改，赋给真实DOM）
+Diff策略：当数据发生更改时，vue会自动对比新旧虚拟DOM（Diff过程），遵循“同层比较，双端对比（vue2）”；vue3中对diff算法进行优化（静态提升，直接复用；动态标记，快速定位复用）
+更新粒度：对于vue2，数据的变化是通过组件为单位收集的，更新某个组件自动会带着其所有的子组件的更新；对于vue3，则以动态节点为单位，更新粒度从组件缩小到动态节点，极大增加效率
+
+
+17.组件使用key的原因：
+
+key是虚拟DOM的唯一标识，可以帮助Diff算法精准定位，从而实现正确复用；
+一定不要使用随机数/index作为key值，这样会造成数据错位/性能极大损耗；
+
+
+18.Vuex和Pinia：
+
+Vuex是老一代通用状态管理器，包含state，action，mutation，getters四个模块，TS支持不友好，模块化需要开启命名空间，较重；
+Pinia是新一代通用状态管理器，不包含mutation模块，TS完美兼容，且天生支持模块化（无需多余操作），极轻；
+
+
+19.选项和组合API：
+
+选项式API通过强制的规定选项，为项目搭好固有框架，分类清晰，适合入门学习；
+组合式API更加灵活，完美支持TS，在大型项目中更加灵活，解决代码复用的痛点，但同时对开发者的要求更高（要清楚如何代码分块，更加灵活的处理代码）；
+
+
+20.provide和inject：
+
+两者用于跨层级传递参数，由父组件provide，孙组件inject；这导致在传递过程中，数据变得来源不明（耦合性强），且接收到的数据类型不明，可能会参数名冲突问题
+此时，我们需要使用TyppeScript限制数据类型，同时提供能够修改该数据的对应函数，同时使用Symbol作为唯一键名以明确参数来源
+
+
+21.组件库的高度定制化：
+
+1.样式定制，通过::deep样式透传实现；2.DOM定制，通过设计者留出slot，使用者写入所需slot实现；3.JS定制，通过绑定函数（this.$refs触发）+ 自定义事件实现
+一个好的组件库，需要提供组件库每个标签的类名（方便样式更改），需要设计足够的插槽（方便自定义拓展功能），需要设计一定的自定义事件（实现事件的触发）
+
+
+22.如何让某个组件强制重新渲染：
+
+强制重新渲染可以通过更改组件的key值，或者调用$forceUpdate；但损耗极大，是不得不重新渲染才采用的方法；
+我们通常使用：1.使用Vue.$set和$delete使数据保持响应式；2.使用整体赋值的方式使数据保持响应式  这才是优雅的解决页面响应式消失的问题
+
+
+23.动态组件component的使用、切换与缓存策略：
+
+component组件是vue内置的一个组件，通过其自带的is属性可展示不同的组件，基本用法为<component :is="xxx"></component>，当绑定的is发生变化时，原来的组件会被销毁并生成新的组件；
+由于存在组件的反复变化，通常会与keep-alive组件一起使用，最大效率的利用缓存和内存；同时通过exclude，include精细化管理keep-alive的对象（组件名字）；同时配合activated和deactivated管理生命周期；
+
+
+24.SSR，CSR，SSG：
+
+SSR服务端渲染，服务器压力大，SEO友好，用户端体验极快，适合于高SEO且内容动态变化的网站；
+CSR客户端渲染，首屏加载慢，服务器压力小，无SEO，用户端体验较慢，适合于无需SEO的后台Web应用；
+SSG静态站点生成，构建时预先生成静态页面，服务器压力小，SEO友好，适合于内容稳定的页面；
+对于大多数需要SEO的vue项目，Nuxt.js是统一首选方案，它能让你根据页面特性灵活选择渲染方案
+
+
+25.大表单的校验、联动、性能优化：
+
+校验通常依赖UI校验和逻辑层提交校验两类：UI校验即输入时校验（字符合法性，直接在输入时对用户提醒），逻辑层校验则是在提交表单时对所有数据进行校验；（尽量使用框架的生态进行校验，避免手动书写校验规则）
+联动方案：watch通过监视表单A的值去变化表单B的选项和校验规则；computed通过监视表单A的值去实时计算表单B的选项并返回；（在实践中，常常把表单联动的复杂逻辑封装进单独的文件进行引入）
+性能优化：问题一般出在数据量庞大和频繁重新渲染上，我们通过组件拆分（缩小渲染范围），按需校验（非input校验，而是blur校验，减少校验次数），虚拟滚动（减少DOM渲染数量），优化computed重型计算（算法优化，确保依赖项尽可能少）
+
+
+26.Vue项目的懒加载，预加载和骨架屏设计：
+
+懒加载：用到的时候再加载，优化首屏速度，提高性能；（路由懒加载，defineAsyncComponent组件懒加载）
+预加载：提前加载后续可能需要的资源，提高用户流畅度体验；（webpack的魔法注释，PreLoad（即将访问）和Prefetch（下一步可能访问））
+骨架屏：加载过程中，页面展示加载时的布局占位，提升用户的加载体验
+
+
+
+27.axios的二次封装，拦截器、取消请求、重试机制、统一错误处理：
